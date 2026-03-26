@@ -105,14 +105,15 @@ lib/
 
 ⸻
 
-🛡️ Notes
+🛡️ Notes  
+
 	•	Database is clean and production-ready
 	•	Only essential demo and admin users are included
 	•	Environment variables are secured and not exposed
 
 ⸻
 
-👨‍💻 Author
+👨‍💻 Author  
 
 Suraj S
 Email : suraj28238@gmail.com
