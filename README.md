@@ -20,7 +20,7 @@ A full-stack web application that combines golf, charity, and rewards, allowing 
 🛠️ Admin Access  
 
 	•	Email: admin@golfcharity.com
-	•	Password: Admin@123
+	•	Password: admin123
 
 ⸻
 
