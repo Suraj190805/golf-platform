@@ -77,7 +77,8 @@ npm run dev
 
 ⸻
 
-🧠 How It Works
+🧠 How It Works  
+
 	1.	Users subscribe to the platform
 	2.	Submit golf scores
 	3.	Participate in monthly draws
