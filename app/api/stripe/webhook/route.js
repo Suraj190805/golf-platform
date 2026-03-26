@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
-import Stripe from "stripe"
+import { getStripe } from "@/lib/stripe"
 import { createServerClient } from "@/lib/supabaseServer"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+export const maxDuration = 30
 
 export async function POST(request) {
   const body = await request.text()
@@ -11,7 +11,7 @@ export async function POST(request) {
   let event
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
@@ -22,6 +22,7 @@ export async function POST(request) {
   }
 
   const supabase = createServerClient()
+  const stripe = getStripe()
 
   switch (event.type) {
     case "checkout.session.completed": {
@@ -31,7 +32,6 @@ export async function POST(request) {
       const subscriptionId = session.subscription
 
       if (userId) {
-        // Get subscription details from Stripe
         const subscription = await stripe.subscriptions.retrieve(subscriptionId)
         const periodEnd = new Date(subscription.current_period_end * 1000)
 
@@ -53,7 +53,6 @@ export async function POST(request) {
       const subscription = event.data.object
       const customerId = subscription.customer
 
-      // Find user by Stripe customer ID
       const { data: profile } = await supabase
         .from("profiles")
         .select("id")

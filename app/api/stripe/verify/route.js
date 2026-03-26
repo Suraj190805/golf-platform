@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
-import Stripe from "stripe"
+import { getStripe } from "@/lib/stripe"
 import { createServerClient } from "@/lib/supabaseServer"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+export const maxDuration = 30
 
 // POST: Verify a checkout session and sync subscription status
 export async function POST(request) {
@@ -28,8 +28,7 @@ export async function POST(request) {
   }
 
   try {
-    // Retrieve the checkout session from Stripe
-    const session = await stripe.checkout.sessions.retrieve(session_id, {
+    const session = await getStripe().checkout.sessions.retrieve(session_id, {
       expand: ["subscription"],
     })
 
@@ -44,7 +43,6 @@ export async function POST(request) {
     if (typeof subscription === "object" && subscription.current_period_end) {
       periodEnd = new Date(subscription.current_period_end * 1000)
     } else {
-      // Compute from plan when Stripe doesn't provide period end
       periodEnd = new Date()
       if (plan === "yearly") {
         periodEnd.setFullYear(periodEnd.getFullYear() + 1)
@@ -53,7 +51,6 @@ export async function POST(request) {
       }
     }
 
-    // Update the user's profile with subscription info
     const updates = {
       subscription_status: "active",
       subscription_plan: plan,

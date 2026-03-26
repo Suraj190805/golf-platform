@@ -1,13 +1,8 @@
 import { NextResponse } from "next/server"
-import Stripe from "stripe"
+import { getStripe } from "@/lib/stripe"
 import { createServerClient } from "@/lib/supabaseServer"
 
-function getStripe() {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("STRIPE_SECRET_KEY is not set")
-  }
-  return new Stripe(process.env.STRIPE_SECRET_KEY)
-}
+export const maxDuration = 30
 
 export async function POST(request) {
   const supabase = createServerClient()
@@ -31,13 +26,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "Invalid plan. Choose 'monthly' or 'yearly'" }, { status: 400 })
   }
 
-  let stripe
-  try {
-    stripe = getStripe()
-  } catch (err) {
-    console.error("Stripe init error:", err.message)
-    return NextResponse.json({ error: "Payment service not configured" }, { status: 500 })
-  }
+  const stripe = getStripe()
 
   // Get or create Stripe customer
   const { data: profile } = await supabase
@@ -61,13 +50,12 @@ export async function POST(request) {
       .eq("id", user.id)
   }
 
-  // Price IDs — set these in your Stripe dashboard
   const priceId = plan === "monthly"
     ? process.env.STRIPE_MONTHLY_PRICE_ID
     : process.env.STRIPE_YEARLY_PRICE_ID
 
   if (!priceId) {
-    return NextResponse.json({ error: "Price not configured. Set STRIPE_MONTHLY_PRICE_ID / STRIPE_YEARLY_PRICE_ID in env" }, { status: 500 })
+    return NextResponse.json({ error: "Price not configured" }, { status: 500 })
   }
 
   try {
@@ -76,8 +64,8 @@ export async function POST(request) {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://golf-platform-iota.vercel.app"}/dashboard?subscription=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://golf-platform-iota.vercel.app"}/subscribe?cancelled=true`,
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/dashboard?subscription=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/subscribe?cancelled=true`,
       metadata: {
         supabase_user_id: user.id,
         plan,
@@ -86,8 +74,7 @@ export async function POST(request) {
 
     return NextResponse.json({ url: session.url })
   } catch (err) {
-    console.error("Stripe checkout error:", err.message, err.type, err.statusCode)
+    console.error("Stripe checkout error:", err.message, err.type)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
-

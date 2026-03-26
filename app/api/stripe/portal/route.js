@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
-import Stripe from "stripe"
+import { getStripe } from "@/lib/stripe"
 import { createServerClient } from "@/lib/supabaseServer"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+export const maxDuration = 30
 
 export async function POST(request) {
   const supabase = createServerClient()
@@ -30,7 +30,7 @@ export async function POST(request) {
   }
 
   try {
-    const session = await stripe.billingPortal.sessions.create({
+    const session = await getStripe().billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
       return_url: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/dashboard`,
     })
