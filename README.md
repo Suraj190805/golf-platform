@@ -12,11 +12,13 @@ A full-stack web application that combines golf, charity, and rewards, allowing 
 
 🔐 Demo Credentials
 
-👤 Demo User
+👤 Demo User  
+
 	•	Email: demo@golfcharity.com
 	•	Password: Demo@123
 
-🛠️ Admin Access
+🛠️ Admin Access  
+
 	•	Email: admin@golfcharity.com
 	•	Password: Admin@123
 
