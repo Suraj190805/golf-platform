@@ -24,7 +24,8 @@ A full-stack web application that combines golf, charity, and rewards, allowing 
 
 ⸻
 
-✨ Features
+✨ Features  
+
 	•	🧾 User Authentication (Signup/Login)
 	•	💳 Subscription System (Stripe Integration)
 	•	🏌️ Score Submission & Tracking
@@ -35,7 +36,8 @@ A full-stack web application that combines golf, charity, and rewards, allowing 
 
 ⸻
 
-🧱 Tech Stack
+🧱 Tech Stack  
+
 	•	Frontend: Next.js (App Router)
 	•	Backend: Supabase (Database + Auth)
 	•	Payments: Stripe
